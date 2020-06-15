@@ -16,6 +16,7 @@ function HeaderLoggedOut(props) {
         localStorage.setItem("complexappUsername", response.data.username)
         localStorage.setItem("complexappAvatar", response.data.avatar)
         appDispatch({ type: "login" })
+        appDispatch({ type: "flashMessage", value: "You have successfully logged in!" })
       } else {
         console.log("Incorrect username or password.")
       }
