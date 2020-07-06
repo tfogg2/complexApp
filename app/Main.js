@@ -7,6 +7,7 @@ import Footer from "./components/Footer"
 import HomeGuest from "./components/HomeGuest"
 import Home from "./components/Home"
 import About from "./components/About"
+import EditPost from "./components/EditPost"
 import Profile from "./components/Profile"
 import Terms from "./components/Terms"
 import CreatePost from "./components/CreatePost"
@@ -78,6 +79,9 @@ function Main() {
             </Route>
             <Route path="/post/:id" exact>
               <ViewSinglePost />
+            </Route>
+            <Route path="/post/:id/edit" exact>
+              <EditPost />
             </Route>
             <Route path="/terms" exact>
               <Terms />
