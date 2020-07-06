@@ -10,6 +10,7 @@ import About from "./components/About"
 import EditPost from "./components/EditPost"
 import Profile from "./components/Profile"
 import Terms from "./components/Terms"
+import NotFound from "./components/NotFound"
 import CreatePost from "./components/CreatePost"
 import ViewSinglePost from "./components/ViewSinglePost"
 import FlashMessages from "./components/FlashMessages"
@@ -85,6 +86,9 @@ function Main() {
             </Route>
             <Route path="/terms" exact>
               <Terms />
+            </Route>
+            <Route>
+              <NotFound />
             </Route>
           </Switch>
           <Footer />

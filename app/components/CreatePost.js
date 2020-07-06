@@ -27,7 +27,7 @@ function CreatePost(props) {
 
   return (
     <Page title="create-post">
-      <form onSubmit={handleSubmit}>
+      <form className="mt-3" onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="post-title" className="text-muted mb-1">
             <small>Title</small>
