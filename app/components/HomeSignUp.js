@@ -1,16 +1,27 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useContext } from "react"
 import Axios from "axios"
+import DispatchContext from "../DispatchContext"
+import StateContext from "../StateContext"
+import { withRouter } from "react-router-dom"
+import { useImmer } from "use-immer"
 
-function HomeSignUp() {
+function HomeSignUp(props) {
   const [username, setUsername] = useState()
   const [email, setEmail] = useState()
   const [password, setPassword] = useState()
+  const [loggedIn, setLoggedIn] = useState()
+  const appDispatch = useContext(DispatchContext)
+  const appState = useContext(StateContext)
+  const [state, setState] = useImmer()
 
   async function handleFormSubmit(e) {
     e.preventDefault()
     try {
       const response = await Axios.post("http://Localhost:8080/register", { username, password, email })
       console.log(response.data)
+      appDispatch({ type: "flashMessage", value: "Welcome, you've joined the mayhem!" })
+      appDispatch({ type: "login", data: response.data })
+      props.history.push(`/profile/${username}`)
       console.log("User was successfully created")
     } catch (e) {
       console.log("There was a problem")
@@ -44,4 +55,4 @@ function HomeSignUp() {
   )
 }
 
-export default HomeSignUp
+export default withRouter(HomeSignUp)

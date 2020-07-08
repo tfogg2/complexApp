@@ -13,11 +13,46 @@ import Terms from "./components/Terms"
 import NotFound from "./components/NotFound"
 import CreatePost from "./components/CreatePost"
 import ViewSinglePost from "./components/ViewSinglePost"
+import Search from "./components/Search"
 import FlashMessages from "./components/FlashMessages"
 import StateContext from "./StateContext"
 import DispatchContext from "./DispatchContext"
+import { createUseStyles } from "react-jss"
 import Axios from "axios"
+import { CSSTransition } from "react-transition-group"
 Axios.defaults.baseURL = "http://localhost:8080"
+
+const useStyles = createUseStyles({
+  searchOverlay: {
+    display: "flex",
+    flexDirection: "column",
+    position: "fixed",
+    zIndex: "9000",
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+    backgroundColor: "rgba(215, 215, 215, 0.911)"
+  },
+  searchOverlayEnter: {
+    opacity: 0,
+    transform: "scale(1.3)"
+  },
+  searchOverlayEnterActive: {
+    opacity: 1,
+    transform: "scale(1)",
+    transition: "0.33s visibility ease-in-out, 0.33s opacity ease-in-out, 0.33s transform ease-in-out"
+  },
+  searchOVerlayExit: {
+    opacity: 1,
+    transform: "scale(1)"
+  },
+  searchOverlayExitActive: {
+    opacity: 0,
+    transform: "scale(1.3)",
+    transition: ".33s visibility ease-in-out, .33s opacity ease-in-out, .33s transform ease-in-out"
+  }
+})
 
 function Main() {
   const initialState = {
@@ -27,8 +62,11 @@ function Main() {
       token: localStorage.getItem("complexappToken"),
       username: localStorage.getItem("complexappUsername"),
       avatar: localStorage.getItem("complexappAvatar")
-    }
+    },
+    isSearchOpen: false
   }
+
+  const classes = useStyles()
 
   const [state, dispatch] = useImmerReducer(ourReducer, initialState)
 
@@ -43,7 +81,12 @@ function Main() {
         return
       case "flashMessage":
         draft.flashMessages.push(action.value)
-        break
+        return
+      case "openSearch":
+        draft.isSearchOpen = true
+        return
+      case "closeSearch":
+        draft.isSearchOpen = false
     }
   }
 
@@ -91,6 +134,19 @@ function Main() {
               <NotFound />
             </Route>
           </Switch>
+          <CSSTransition
+            timeout={330}
+            in={state.isSearchOpen}
+            classNames={{
+              enter: classes.searchOverlayEnter,
+              enterActive: classes.searchOverlayEnterActive,
+              exit: classes.searchOverlayExit,
+              exitActive: classes.searchOverlayExitActive
+            }}
+            unmountOnExit
+          >
+            <Search />
+          </CSSTransition>
           <Footer />
         </BrowserRouter>
       </DispatchContext.Provider>

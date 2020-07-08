@@ -127,6 +127,7 @@ function EditPost(props) {
         try {
           const response = await Axios.post(`/post/${state.id}/edit`, { title: state.title.value, body: state.body.value, token: appState.user.token }, { cancelToken: ourRequest.token })
           dispatch({ type: "saveRequestFinished" })
+          props.history.push(`/post/${state.id}`)
           appDispatch({ type: "flashMessage", value: "Post was updated!" })
         } catch (e) {
           console.log("There was an error.")
