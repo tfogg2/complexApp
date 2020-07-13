@@ -7,6 +7,7 @@ import Footer from "./components/Footer"
 import HomeGuest from "./components/HomeGuest"
 import Home from "./components/Home"
 import About from "./components/About"
+import Chat from "./components/Chat"
 import EditPost from "./components/EditPost"
 import Profile from "./components/Profile"
 import Terms from "./components/Terms"
@@ -63,7 +64,9 @@ function Main() {
       username: localStorage.getItem("complexappUsername"),
       avatar: localStorage.getItem("complexappAvatar")
     },
-    isSearchOpen: false
+    isSearchOpen: false,
+    isChatOpen: false,
+    unReadChatCount: 0
   }
 
   const classes = useStyles()
@@ -87,6 +90,21 @@ function Main() {
         return
       case "closeSearch":
         draft.isSearchOpen = false
+        return
+      case "toggleChat":
+        draft.isChatOpen = !draft.isChatOpen
+        return
+      case "closeChat":
+        draft.isChatOpen = false
+        return
+
+      case "incrementUnreadChatCount":
+        draft.unReadChatCount++
+        return
+
+      case "clearUnreadChatCount":
+        draft.unReadChatCount = 0
+        return
     }
   }
 
@@ -147,6 +165,7 @@ function Main() {
           >
             <Search />
           </CSSTransition>
+          <Chat />
           <Footer />
         </BrowserRouter>
       </DispatchContext.Provider>
