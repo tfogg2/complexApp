@@ -17,13 +17,14 @@ function HomeSignUp(props) {
   async function handleFormSubmit(e) {
     e.preventDefault()
     try {
-      const response = await Axios.post("http://Localhost:8080/register", { username, password, email })
+      const response = await Axios.post("http://localhost:8080/register", { username, password, email })
       console.log(response.data)
       appDispatch({ type: "flashMessage", value: "Welcome, you've joined the mayhem!" })
       appDispatch({ type: "login", data: response.data })
       props.history.push(`/profile/${username}`)
       console.log("User was successfully created")
     } catch (e) {
+      appDispatch({ type: "flashMessage", value: e.data })
       console.log("There was a problem")
     }
   }

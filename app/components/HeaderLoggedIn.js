@@ -1,5 +1,5 @@
 import React, { useEffect, useContext } from "react"
-import { Link } from "react-router-dom"
+import { Link, withRouter } from "react-router-dom"
 import DispatchContext from "../DispatchContext"
 import StateContext from "../StateContext"
 import ReactTooltip from "react-tooltip"
@@ -10,6 +10,7 @@ function HeaderLoggedIn(props) {
 
   function handleLogOut() {
     appDispatch({ type: "logout" })
+    props.history.push("")
     appDispatch({ type: "flashMessage", value: "You have successfully logged out!" })
   }
 
@@ -48,4 +49,4 @@ function HeaderLoggedIn(props) {
   )
 }
 
-export default HeaderLoggedIn
+export default withRouter(HeaderLoggedIn)

@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useEffect } from "react"
+import React, { useState, useReducer, useEffect, Suspense } from "react"
 import ReactDOM from "react-dom"
 import { useImmerReducer } from "use-immer"
 import { BrowserRouter, Switch, Route } from "react-router-dom"
@@ -6,21 +6,22 @@ import Header from "./components/Header"
 import Footer from "./components/Footer"
 import HomeGuest from "./components/HomeGuest"
 import Home from "./components/Home"
-import About from "./components/About"
-import Chat from "./components/Chat"
-import EditPost from "./components/EditPost"
-import Profile from "./components/Profile"
-import Terms from "./components/Terms"
-import NotFound from "./components/NotFound"
-import CreatePost from "./components/CreatePost"
-import ViewSinglePost from "./components/ViewSinglePost"
-import Search from "./components/Search"
+const About = React.lazy(() => import("./components/About"))
+const Chat = React.lazy(() => import("./components/Chat"))
+const Terms = React.lazy(() => import("./components/Terms"))
+const NotFound = React.lazy(() => import("./components/NotFound"))
+const Profile = React.lazy(() => import("./components/Profile"))
+const CreatePost = React.lazy(() => import("./components/CreatePost"))
+const ViewSinglePost = React.lazy(() => import("./components/ViewSinglePost"))
+const EditPost = React.lazy(() => import("./components/EditPost"))
+const Search = React.lazy(() => import("./components/Search"))
 import FlashMessages from "./components/FlashMessages"
 import StateContext from "./StateContext"
 import DispatchContext from "./DispatchContext"
 import { createUseStyles } from "react-jss"
 import Axios from "axios"
 import { CSSTransition } from "react-transition-group"
+import LoadingDotsIcon from "./components/LoadingDotsIcon"
 Axios.defaults.baseURL = "http://localhost:8080"
 
 const useStyles = createUseStyles({
@@ -120,38 +121,63 @@ function Main() {
     }
   }, [state.loggedIn])
 
+  //check if token has expired on first render
+
+  useEffect(() => {
+    if (state.loggedIn) {
+      const ourRequest = Axios.CancelToken.source()
+      async function fetchResults() {
+        try {
+          const response = await Axios.post("/checkToken", { token: state.user.token }, { cancelToken: ourRequest.token })
+          if (!response.data) {
+            appDispatch({ type: "logout" })
+            props.history.push("")
+            appDispatch({ type: "flashMessage", value: "Your session has expired. Please login again." })
+          }
+        } catch (e) {
+          console.log("There was a problem or the request was canceled")
+        }
+      }
+      fetchResults()
+
+      return () => ourRequest.cancel()
+    }
+  }, [])
+
   return (
     <StateContext.Provider value={state}>
       <DispatchContext.Provider value={dispatch}>
         <BrowserRouter>
           <FlashMessages messages={state.flashMessages} />
           <Header />
-          <Switch>
-            <Route path="/profile/:username">
-              <Profile />
-            </Route>
-            <Route path="/" exact>
-              {state.loggedIn ? <Home /> : <HomeGuest />}
-            </Route>
-            <Route path="/about-us" exact>
-              <About />
-            </Route>
-            <Route path="/create-post" exact>
-              <CreatePost />
-            </Route>
-            <Route path="/post/:id" exact>
-              <ViewSinglePost />
-            </Route>
-            <Route path="/post/:id/edit" exact>
-              <EditPost />
-            </Route>
-            <Route path="/terms" exact>
-              <Terms />
-            </Route>
-            <Route>
-              <NotFound />
-            </Route>
-          </Switch>
+          <Suspense fallback={<LoadingDotsIcon />}>
+            <Switch>
+              <Route path="/profile/:username">
+                <Profile />
+              </Route>
+              <Route path="/" exact>
+                {state.loggedIn ? <Home /> : <HomeGuest />}
+              </Route>
+              <Route path="/about-us" exact>
+                <About />
+              </Route>
+              <Route path="/create-post" exact>
+                <CreatePost />
+              </Route>
+              <Route path="/post/:id" exact>
+                <ViewSinglePost />
+              </Route>
+              <Route path="/post/:id/edit" exact>
+                <EditPost />
+              </Route>
+              <Route path="/terms" exact>
+                <Terms />
+              </Route>
+              <Route>
+                <NotFound />
+              </Route>
+            </Switch>
+          </Suspense>
           <CSSTransition
             timeout={330}
             in={state.isSearchOpen}
@@ -163,9 +189,13 @@ function Main() {
             }}
             unmountOnExit
           >
-            <Search />
+            <div className="search-overlay">
+              <Suspense fallback="">
+                <Search />
+              </Suspense>
+            </div>
           </CSSTransition>
-          <Chat />
+          <Suspense fallback="">{state.loggedIn && <Chat />}</Suspense>
           <Footer />
         </BrowserRouter>
       </DispatchContext.Provider>

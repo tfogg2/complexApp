@@ -7,9 +7,8 @@ import DispatchContext from "../DispatchContext"
 import { useImmer } from "use-immer"
 import io from "socket.io-client"
 
-const socket = io("http://localhost:8080")
-
 function Chat() {
+  const socket = useRef(null)
   const appState = useContext(StateContext)
   const appDispatch = useContext(DispatchContext)
   const chatField = useRef(null)
@@ -21,11 +20,15 @@ function Chat() {
 
   useEffect(() => {
     //(event being sent from the Socket server, function to run when that event happens)
-    socket.on("chatFromServer", message => {
+    socket.current = io("http://localhost:8080")
+
+    socket.current.on("chatFromServer", message => {
       setState(draft => {
         draft.chatMessages.push(message)
       })
     })
+
+    return () => socket.current.disconnect()
   }, [])
 
   useEffect(() => {
@@ -57,7 +60,7 @@ function Chat() {
   function handleSubmit(e) {
     e.preventDefault()
 
-    socket.emit("chatFromBrowser", { message: state.fieldValue, token: appState.user.token })
+    socket.current.emit("chatFromBrowser", { message: state.fieldValue, token: appState.user.token })
 
     setState(draft => {
       //Add message to state
