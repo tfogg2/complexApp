@@ -10,6 +10,7 @@
     "webpackBuild": "webpack",
     "previewDist": "node previewDist",
     "generate": "babel-node --presets=@babel/preset-react,@babel/preset-env generateHtml.js",
+    "start": "react-scripts start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
