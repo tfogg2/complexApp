@@ -20,7 +20,7 @@ function Chat() {
 
   useEffect(() => {
     //(event being sent from the Socket server, function to run when that event happens)
-    socket.current = io("http://localhost:8080")
+    socket.current = io(process.env.BACKENDURL || "https://backend-a.herokuapp.com")
 
     socket.current.on("chatFromServer", message => {
       setState(draft => {
