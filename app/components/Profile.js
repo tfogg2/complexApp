@@ -1,22 +1,14 @@
 import React, { useEffect, useContext, useState } from "react"
-import { createUseStyles } from "react-jss"
 import Page from "./Page"
 import { useParams, NavLink, Switch, Route } from "react-router-dom"
 import Axios from "axios"
 import Follower from "./Follower"
+import NotFound from "./NotFound"
 import StateContext from "../StateContext"
 import ProfilePosts from "./ProfilePosts"
 import { useImmer } from "use-immer"
 
-const useStyles = createUseStyles(theme => ({
-  exampleStyle: {
-    height: theme.x
-  }
-}))
-
 function Profile() {
-  const classes = useStyles()
-
   const { username } = useParams()
 
   const [state, setState] = useImmer({
@@ -38,9 +30,13 @@ function Profile() {
     async function fetchData() {
       try {
         const response = await Axios.post(`/profile/${username}`, { token: appState.user.token }, { cancelToken: ourRequest.token })
-        setState(draft => {
-          draft.profileData = response.data
-        })
+        if (response.data) {
+          setState(draft => {
+            draft.profileData = response.data
+          })
+        } else {
+          ;<NotFound />
+        }
       } catch (e) {
         console.log("There was a problem.")
       }

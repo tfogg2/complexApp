@@ -16,10 +16,12 @@ function CreatePost(props) {
     try {
       const response = await Axios.post("/create-post", { title, body, token: appState.user.token })
       // Redirect to new post url
-      appDispatch({ type: "flashMessage", value: "Congrats, you created a new post!" })
-      props.history.push(`/post/${response.data}`)
-      console.log("New post was created")
-      console.log(response.data)
+      if (response.data) {
+        appDispatch({ type: "flashMessage", value: "Congrats, you created a new post!" })
+        props.history.push(`/post/${response.data}`)
+      } else {
+        appDispatch({ type: "flashMessage", value: "There was an error when creating your post, make sure you added a title and body." })
+      }
     } catch (e) {
       console.log("There was an error.")
     }
